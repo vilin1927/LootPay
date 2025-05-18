@@ -1,1 +1,1 @@
-web: . /opt/venv/bin/activate && python main.py 
+web: python run_bot.py 
