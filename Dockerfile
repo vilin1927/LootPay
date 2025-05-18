@@ -21,4 +21,4 @@ COPY . .
 ENV PYTHONPATH=/app
 
 # Run the bot
-CMD ["python3", "main.py"] 
+CMD ["python3", "bot.py"] 
