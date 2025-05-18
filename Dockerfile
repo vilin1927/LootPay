@@ -17,8 +17,8 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY . .
 
-# Set Python path
+# Set Python path to include the current directory
 ENV PYTHONPATH=/app
 
 # Run the bot
-CMD ["python3", "run_bot.py"] 
+CMD ["python3", "main.py"] 
