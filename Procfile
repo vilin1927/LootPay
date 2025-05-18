@@ -1,1 +1,1 @@
-web: python main.py 
+web: . /opt/venv/bin/activate && python main.py 
