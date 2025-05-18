@@ -19,42 +19,50 @@ welcome_keyboard = InlineKeyboardMarkup(
     ]
 )
 
-# Create keyboard for platform selection
-platform_keyboard = InlineKeyboardMarkup(
+# Create keyboard for question 1
+q1_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Steam", callback_data="platform_steam"),
-            InlineKeyboardButton(text="Epic Games", callback_data="platform_epic"),
+            InlineKeyboardButton(text="🎮 Играми", callback_data="q1_games"),
         ],
         [
-            InlineKeyboardButton(text="Консоли", callback_data="platform_console"),
-            InlineKeyboardButton(text="Не играю", callback_data="platform_none"),
+            InlineKeyboardButton(text="✨ Внутряшками (скины, пьюрочки, кейсы)", callback_data="q1_items"),
+        ],
+        [
+            InlineKeyboardButton(text="🚫 Ничего не беру", callback_data="q1_nothing"),
+        ],
+        [
+            InlineKeyboardButton(text="📴 Не юзаю Стим", callback_data="q1_no_steam"),
         ]
     ]
 )
 
-# Create keyboard for game type selection
-game_type_keyboard = InlineKeyboardMarkup(
+# Create keyboard for question 2
+q2_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Онлайн", callback_data="game_online"),
-            InlineKeyboardButton(text="Оффлайн", callback_data="game_offline"),
+            InlineKeyboardButton(text="👍 Да, юзаю", callback_data="q2_yes"),
         ],
         [
-            InlineKeyboardButton(text="Не играю", callback_data="game_none"),
+            InlineKeyboardButton(text="👎 Да, но забросил(а)", callback_data="q2_past"),
+        ],
+        [
+            InlineKeyboardButton(text="❌ Нет", callback_data="q2_no"),
         ]
     ]
 )
 
-# Create keyboard for payment preference
-payment_keyboard = InlineKeyboardMarkup(
+# Create keyboard for question 3
+q3_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Платные игры", callback_data="payment_paid"),
-            InlineKeyboardButton(text="Бесплатные игры", callback_data="payment_free"),
+            InlineKeyboardButton(text="✅ Да, ок", callback_data="q3_ok"),
         ],
         [
-            InlineKeyboardButton(text="И те, и другие", callback_data="payment_both"),
+            InlineKeyboardButton(text="🇬🇧 Я из Британии", callback_data="q3_uk"),
+        ],
+        [
+            InlineKeyboardButton(text="❌ Нет, не в тему", callback_data="q3_no"),
         ]
     ]
 )
@@ -62,6 +70,9 @@ payment_keyboard = InlineKeyboardMarkup(
 @router.message(Command("start"))
 async def cmd_start(message: Message, state: FSMContext):
     """Handle the /start command and show welcome message"""
+    # Clear any existing state
+    await state.clear()
+    
     welcome_text = (
         "Привет, это LootPay!\n"
         "Бот для быстрого и надёжного пополнения Steam‑кошелька 🚀\n\n"
@@ -80,44 +91,43 @@ async def cmd_start(message: Message, state: FSMContext):
 async def start_qualification(callback: CallbackQuery, state: FSMContext):
     """Start the qualification process when user clicks 'Начать пополнение'"""
     await callback.message.edit_text(
-        "Где ты играешь чаще всего?",
-        reply_markup=platform_keyboard
+        "Куда обычно в Стиме сливаешь бабло?",
+        reply_markup=q1_keyboard
     )
-    await state.set_state(QualificationStates.waiting_for_platform)
+    await state.set_state(QualificationStates.waiting_for_q1)
 
-@router.callback_query(QualificationStates.waiting_for_platform)
-async def process_platform(callback: CallbackQuery, state: FSMContext):
-    """Process user's gaming platform response"""
-    platform = callback.data.split('_')[1]
-    
-    if platform != "steam":
-        await callback.message.edit_text("Наш бот только для пользователей Steam. Удачи!")
-        await state.clear()
-        return
-    
+@router.callback_query(QualificationStates.waiting_for_q1)
+async def process_q1(callback: CallbackQuery, state: FSMContext):
+    """Process answer to question 1"""
     await callback.message.edit_text(
-        "Какие игры ты предпочитаешь?",
-        reply_markup=game_type_keyboard
+        "Пробовал(а) другие пополнялки?",
+        reply_markup=q2_keyboard
     )
-    await state.set_state(QualificationStates.waiting_for_game_type)
+    await state.set_state(QualificationStates.waiting_for_q2)
 
-@router.callback_query(QualificationStates.waiting_for_game_type)
-async def process_game_type(callback: CallbackQuery, state: FSMContext):
-    """Process user's game type preference"""
+@router.callback_query(QualificationStates.waiting_for_q2)
+async def process_q2(callback: CallbackQuery, state: FSMContext):
+    """Process answer to question 2"""
     await callback.message.edit_text(
-        "Ты покупаешь платные игры или играешь только в бесплатные?",
-        reply_markup=payment_keyboard
+        "Мы делаем пополнение в USD для всех стран (кроме UK) — гуд?",
+        reply_markup=q3_keyboard
     )
-    await state.set_state(QualificationStates.waiting_for_payment_preference)
+    await state.set_state(QualificationStates.waiting_for_q3)
 
-@router.callback_query(QualificationStates.waiting_for_payment_preference)
-async def process_payment_preference(callback: CallbackQuery, state: FSMContext):
-    """Process user's payment preference"""
-    payment_type = callback.data.split('_')[1]
-    
-    if payment_type == "free":
-        await callback.message.edit_text("Этот бот полезен только тем, кто покупает платные игры. Удачи!")
-    else:
-        await callback.message.edit_text("Круто, ты наш человек! Скоро начнём.")
-    
+@router.callback_query(QualificationStates.waiting_for_q3)
+async def process_q3(callback: CallbackQuery, state: FSMContext):
+    """Process answer to question 3 and show final message"""
+    final_message = (
+        "🎉 **Круто, ты прошёл опрос!**\n\n"
+        "🚀 За это тебе подарок — первое пополнение **без комиссии**! Мы за это в ответе.\n"
+        "🔄 Дальше при пополнении учитывай комиссию **8–10%** — всё честно и прозрачно.\n\n"
+        "---\n\n"
+        "Введите **никнейм** своего аккаунта в Steam, который будем пополнять.\n"
+        "❗️ Никнейм ≠ логин. Узнать свой никнейм можно [здесь](https://telegra.ph/CHasto-zadavaemye-voprosy-pri-pokupke-04-09#%D0%98%D0%BC%D1%8F-%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0-Steam---%D0%BA%D0%B0%D0%BA-%D0%BD%D0%B0%D0%B9%D1%82%D0%B8-?)"
+    )
+    await callback.message.edit_text(
+        final_message,
+        parse_mode="Markdown",
+        disable_web_page_preview=True
+    )
     await state.clear() 
