@@ -25,4 +25,4 @@ RUN chown -R appuser:appuser /app
 USER appuser
 
 # Command to run the bot
-CMD ["python", "run_bot.py"]
+CMD ["python", "main.py"]

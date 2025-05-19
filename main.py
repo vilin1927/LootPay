@@ -2,9 +2,14 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from config import BOT_TOKEN
 from handlers import qual_questions
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -23,4 +28,4 @@ async def main():
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())
