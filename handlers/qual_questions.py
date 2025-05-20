@@ -23,16 +23,16 @@ welcome_keyboard = InlineKeyboardMarkup(
 q1_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="🎮 Играми", callback_data="q1_games"),
+            InlineKeyboardButton(text="🎮 Игры — покупаю новинки и классику", callback_data="q1_games"),
         ],
         [
-            InlineKeyboardButton(text="✨ Внутряшками (скины, пьюрочки, кейсы)", callback_data="q1_items"),
+            InlineKeyboardButton(text="✨ Внутриигровые штуки — скины, кейсы, боевые пропуски", callback_data="q1_items"),
         ],
         [
-            InlineKeyboardButton(text="🚫 Ничего не беру", callback_data="q1_nothing"),
+            InlineKeyboardButton(text="💸 Другое — что-то ещё, не из этого", callback_data="q1_other"),
         ],
         [
-            InlineKeyboardButton(text="📴 Не юзаю Стим", callback_data="q1_no_steam"),
+            InlineKeyboardButton(text="📴 Вообще не трачу — просто сижу, не покупаю", callback_data="q1_no_spend"),
         ]
     ]
 )
